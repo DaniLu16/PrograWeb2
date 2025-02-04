@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Week 1 - Consume API</title>
+  <script>
+    const completed = (response) => {
+      const data = JSON.parse(response.target.responseText);
+      document.getElementById('result').innerHTML = `
+        <p><strong>Tipo de Cambio ${data.moneda}:</strong></p>
+        <p>Compra: ${data.TipoCompra}</p>
+        <p>Venta: ${data.TipoVenta}</p>
+      `;
+    };
+
+    const error = () => console.log("Error al obtener datos de la API");
+
+    function getExchange() {
+      const currency = document.getElementById('currency').value; // Obtiene el valor del select
+      const ajaxRequest = new XMLHttpRequest(); // AJAX
+      ajaxRequest.addEventListener("load", completed);
+      ajaxRequest.addEventListener("error", error);
+      ajaxRequest.open("GET", `http://localhost:3001/tipocambio?type=${currency}`);
+      ajaxRequest.send();
+    }
+  </script>
+</head>
+
+<body>
+  <h2>Consultar Tipo de Cambio</h2>
+
+  <label for="currency">Selecciona la moneda:</label>
+  <select id="currency">
+    <option value="usd">USD</option>
+    <option value="eur">EUR</option>
+  </select>
+
+  <button onclick="getExchange();">Consultar</button>
+
+  <h3>Resultados:</h3>
+  <div id="result"></div>
+
+</body>
+</html>
