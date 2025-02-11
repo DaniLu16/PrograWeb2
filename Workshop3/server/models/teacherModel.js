@@ -8,4 +8,6 @@ const teacher = new Schema({
   age: { type: Number }
 });
 
+
+
 module.exports = mongoose.model('teachers', teacher);

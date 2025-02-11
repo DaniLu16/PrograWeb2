@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 // database connection
 const mongoose = require("mongoose");
-const db = mongoose.connect("mongodb://127.0.0.1:27017/teachers");
+const db = mongoose.connect("mongodb+srv://danielalucia2716:Dani123@cluster1.6uc6n.mongodb.net/teachers");
 
 // parser for the request body (required for the POST and PUT methods)
 const bodyParser = require("body-parser");
