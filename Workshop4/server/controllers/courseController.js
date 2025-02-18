@@ -1,62 +1,113 @@
-const Course = require("../models/courseModel");
+const Course = require("../models/courseModel"); // Asumiendo que tienes un modelo Course
+const Teacher = require("../models/teacherModel");
 
 /**
- * Creates a course
- *
- * @param {*} req
- * @param {*} res
+ * Crear un curso
  */
-const coursePost = async (req, res) => {
-  let course = new Course(req.body);
-  await course.save()
-    .then(course => {
-      res.status(201); // CREATED
-      res.header({
-        'location': `/api/courses/?id=${course.id}`
+const courseCreate = (req, res) => {
+  let course = new Course();
+  course.name = req.body.name;
+  course.description = req.body.description;
+  course.teacher = req.body.teacher_id; // Este es el ID del profesor
+
+  if (course.name && course.teacher) {
+    course.save()
+      .then(() => {
+        res.status(201); // CREATED
+        res.header({
+          'location': `/courses/?id=${course.id}`
+        });
+        res.json(course);
+      })
+      .catch((err) => {
+        res.status(422);
+        console.log('Error al guardar el curso:', err);
+        res.json({
+          error: 'Hubo un error al guardar el curso'
+        });
       });
-      res.json(course);
+  } else {
+    res.status(422);
+    console.log('Datos inválidos para el curso');
+    res.json({
+      error: 'No se proporcionaron datos válidos para el curso'
+    });
+  }
+};
+
+/**
+ * Obtener todos los cursos
+ */
+const courseGet = (req, res) => {
+  Course.find()
+    .then(courses => {
+      res.json(courses);
     })
-    .catch( err => {
+    .catch(err => {
       res.status(422);
-      console.log('error while saving the course', err);
-      res.json({
-        error: 'There was an error saving the course'
-      });
+      res.json({ "error": err });
     });
 };
 
 /**
- * Get all courses or one
- *
- * @param {*} req
- * @param {*} res
+ * Obtener un curso por ID
  */
-const courseGet = (req, res) => {
-  // if an specific teacher is required
-  if (req.query && req.query.id) {
-    Course.findById(req.query.id).populate('teacher')
-      .then( (course) => {
-        res.json(course);
-      })
-      .catch(err => {
-        res.status(404);
-        console.log('error while queryting the course', err)
-        res.json({ error: "Course doesnt exist" })
-      });
-  } else {
-    // get all teachers
-    Course.find().populate('teacher')
-      .then( courses => {
-        res.json(courses);
-      })
-      .catch(err => {
-        res.status(422);
-        res.json({ "error": err });
-      });
-  }
+const courseGetById = (req, res) => {
+  const { id } = req.params;
+
+  Course.findById(id)
+    .then(course => {
+      if (!course) {
+        return res.status(404).json({ error: "Curso no encontrado" });
+      }
+      res.json(course);
+    })
+    .catch(err => {
+      console.error("Error al obtener el curso:", err);
+      res.status(500).json({ error: "Error interno del servidor" });
+    });
+};
+
+/**
+ * Actualizar un curso por ID
+ */
+const courseUpdate = (req, res) => {
+  const { id } = req.params;
+
+  Course.findByIdAndUpdate(id, req.body, { new: true })
+    .then(updatedCourse => {
+      if (!updatedCourse) {
+        return res.status(404).json({ error: "Curso no encontrado" });
+      }
+      res.json(updatedCourse);
+    })
+    .catch(err => {
+      res.status(500).json({ error: "Error al actualizar el curso", details: err });
+    });
+};
+
+/**
+ * Eliminar un curso por ID
+ */
+const courseDelete = (req, res) => {
+  const { id } = req.params;
+
+  Course.findByIdAndDelete(id)
+    .then(deletedCourse => {
+      if (!deletedCourse) {
+        return res.status(404).json({ error: "Curso no encontrado" });
+      }
+      res.json({ message: "Curso eliminado exitosamente" });
+    })
+    .catch(err => {
+      res.status(500).json({ error: "Error al eliminar el curso", details: err });
+    });
 };
 
 module.exports = {
-  coursePost,
-  courseGet
-}
+  courseCreate,
+  courseGet,
+  courseGetById,
+  courseUpdate,
+  courseDelete
+};

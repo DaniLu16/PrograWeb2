@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gestión de Profesores</title>
+  <title>Gestión de Educación</title>
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
@@ -12,13 +12,11 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <!-- SweetAlert CDN -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-  
 </head>
 
 <body>
   <div class="container py-5">
-    <h1 class="mb-4 text-center">Gestión de Profesores</h1>
+    <h1 class="mb-4 text-center">Gestión de Educación</h1>
     <ul class="nav nav-tabs" id="myTab" role="tablist">
       <li class="nav-item" role="presentation">
         <button class="nav-link active" id="create-tab" data-bs-toggle="tab" data-bs-target="#create" type="button"
@@ -28,8 +26,18 @@
         <button class="nav-link" id="list-tab" data-bs-toggle="tab" data-bs-target="#list" type="button" role="tab"
           aria-controls="list" aria-selected="false">Lista de Profesores</button>
       </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="create-course-tab" data-bs-toggle="tab" data-bs-target="#create-course" type="button" role="tab"
+          aria-controls="create-course" aria-selected="false">Crear Curso</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="list-course-tab" data-bs-toggle="tab" data-bs-target="#list-course" type="button" role="tab"
+          aria-controls="list-course" aria-selected="false">Lista de Cursos</button>
+      </li>
     </ul>
+
     <div class="tab-content" id="myTabContent">
+      <!-- Crear Profesor -->
       <div class="tab-pane fade show active background-box" id="create" role="tabpanel" aria-labelledby="create-tab">
         <form class="mt-4">
           <div class="mb-3">
@@ -51,6 +59,8 @@
           <button type="button" class="btn btn-primary" onclick="createTeacher()">Guardar</button>
         </form>
       </div>
+
+      <!-- Lista de Profesores -->
       <div class="tab-pane fade background-box" id="list" role="tabpanel" aria-labelledby="list-tab">
         <div class="mt-4">
           <button class="btn btn-primary mb-3" onclick="getTeachers()">Mostrar Profesores</button>
@@ -64,12 +74,55 @@
           </table>
         </div>
       </div>
+
+      <!-- Crear Curso -->
+      <div class="tab-pane fade background-box" id="create-course" role="tabpanel" aria-labelledby="create-course-tab">
+        <form class="mt-4">
+          <div class="mb-3">
+            <label for="course_name" class="form-label">Nombre del Curso <i class="fas fa-book"></i></label>
+            <input type="text" class="form-control" id="course_name" placeholder="Ingrese el nombre del curso">
+          </div>
+          <div class="mb-3">
+            <label for="course_code" class="form-label">Código del Curso <i class="fas fa-code"></i></label>
+            <input type="text" class="form-control" id="course_code" placeholder="Ingrese el código del curso">
+          </div>
+          <div class="mb-3">
+            <label for="course_description" class="form-label">Descripción <i class="fas fa-align-left"></i></label>
+            <textarea class="form-control" id="course_description" placeholder="Ingrese la descripción del curso"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="teacher_select" class="form-label">Seleccionar Profesor <i class="fas fa-chalkboard-teacher"></i></label>
+            <select id="teacher_select" class="form-select">
+              <option value="">Seleccione un profesor</option>
+            </select>
+          </div>
+          <button type="button" class="btn btn-primary" onclick="createCourse()">Guardar Curso</button>
+        </form>
+      </div>
+
+      <!-- Lista de Cursos -->
+      <div class="tab-pane fade background-box" id="list-course" role="tabpanel" aria-labelledby="list-course-tab">
+        <div class="mt-4">
+          <button class="btn btn-primary mb-3" onclick="getCourses()">Mostrar Cursos</button>
+          <table id="courseTable" class="table">
+            <tr>
+              <th>Nombre del Curso</th>
+              <th>Código</th>
+              <th>Descripción</th>
+            </tr>
+          </table>
+        </div>
+      </div>
+
     </div>
   </div>
 
   <!-- Bootstrap Bundle with Popper -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="js/functions.js"></script>
+  <script>
+    window.onload = getTeachers;
+  </script>
 </body>
 
 </html>
