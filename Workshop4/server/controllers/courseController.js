@@ -1,38 +1,42 @@
-const Course = require("../models/courseModel"); // Asumiendo que tienes un modelo Course
+const Course = require("../models/courseModel");
 const Teacher = require("../models/teacherModel");
 
 /**
  * Crear un curso
  */
 const courseCreate = (req, res) => {
-  let course = new Course();
-  course.name = req.body.name;
-  course.description = req.body.description;
-  course.teacher = req.body.teacher_id; // Este es el ID del profesor
-
-  if (course.name && course.teacher) {
-    course.save()
-      .then(() => {
-        res.status(201); // CREATED
-        res.header({
-          'location': `/courses/?id=${course.id}`
-        });
-        res.json(course);
-      })
-      .catch((err) => {
-        res.status(422);
-        console.log('Error al guardar el curso:', err);
-        res.json({
-          error: 'Hubo un error al guardar el curso'
-        });
-      });
-  } else {
-    res.status(422);
-    console.log('Datos inválidos para el curso');
-    res.json({
-      error: 'No se proporcionaron datos válidos para el curso'
-    });
+  const { name, code, description, teacher_id } = req.body;
+  if (!name || !code || !description || !teacher_id) {
+    return res.status(422).json({ error: "Faltan campos obligatorios" });
   }
+
+  const course = new Course({
+    name,
+    code,
+    description,
+    teacher: teacher_id
+  });
+
+  // Verifica si el profesor existe
+  Teacher.findById(teacher_id)
+    .then(teacher => {
+      if (!teacher) {
+        return res.status(404).json({ error: 'Profesor no encontrado' });
+      }
+
+      course.save()
+        .then(() => {
+          res.status(201).json(course);
+        })
+        .catch((err) => {
+          console.error('Error al guardar el curso:', err);
+          res.status(422).json({ error: 'Hubo un error al guardar el curso', details: err });
+        });
+    })
+    .catch(err => {
+      console.error("Error al encontrar el profesor:", err);
+      res.status(422).json({ error: "Error al verificar el profesor", details: err });
+    });
 };
 
 /**
@@ -40,12 +44,12 @@ const courseCreate = (req, res) => {
  */
 const courseGet = (req, res) => {
   Course.find()
+    .populate('teacher', 'first_name last_name') // Asegúrate de obtener solo los campos necesarios
     .then(courses => {
       res.json(courses);
     })
     .catch(err => {
-      res.status(422);
-      res.json({ "error": err });
+      res.status(422).json({ error: err });
     });
 };
 
@@ -55,7 +59,7 @@ const courseGet = (req, res) => {
 const courseGetById = (req, res) => {
   const { id } = req.params;
 
-  Course.findById(id)
+  Course.findById(id).populate('teacher', 'name')
     .then(course => {
       if (!course) {
         return res.status(404).json({ error: "Curso no encontrado" });
